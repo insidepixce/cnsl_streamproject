@@ -1,20 +1,16 @@
-def lfsr(seed, taps):
-    while True:
-        feedback = seed[0]  # 첫 번째 비트를 피드백 비트로 사용
-        new_bit = sum(seed[i] for i in taps) % 2  # 터치 위치의 비트들의 합을 계산
-        seed = seed[1:] + [new_bit]  # 시드 값 업데이트
-        yield feedback, seed
+class LFSR:
+    def __init__(self, seed, taps):
+        self.state = seed
+        self.taps = taps
 
-def generate_otp(seed, taps, length):
-    otp = []
-    generator = lfsr(seed, taps)
-    for _ in range(length):
-        feedback, seed = next(generator)
-        otp.append(str(feedback))
-    return ''.join(otp)
+    def step(self):
+        nextbit = sum([self.state[i] for i in self.taps]) % 2
+        self.state.append(nextbit)
+        return self.state.pop(0)
 
-seed = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]  # 초기 시드 값
-taps = [11, 9, 8, 7]  # 터치 위치
+def lfsr_otp(seed, length):
+    seed = [int(i) for i in bin(seed)[2:].zfill(16)]  # Convert to binary
+    lfsr = LFSR(seed, [15, 13, 12, 10])  # 16-bit LFSR with a standard tap sequence
+    return ''.join(str(lfsr.step()) for _ in range(length))
 
-otp = generate_otp(seed, taps, 12)
-print("OTP:", otp)
+print(lfsr_otp(12345, 12))  # Replace 12345 with your seed
