@@ -16,4 +16,5 @@ def lfsr_otp(length):
     lfsr = LFSR(seed, [15, 13, 12, 10])  
     return ''.join(str(lfsr.step()) for _ in range(length))
 
-print(lfsr_otp(12))  
+print(lfsr_otp(int(input("OTP 길이: "))))  
+
